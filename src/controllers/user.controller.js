@@ -82,14 +82,12 @@ const loginUser = async (req,res) => {
         const options = {
             httpOnly: true,
             secure: true,
-            sameSite: "none",  
           }
     
           const fullUser = {
             username: user.email,
             email: user.email
           }
-    
         return res
         .cookie("accessToken", accessToken,options)
         .status(200)
@@ -100,7 +98,19 @@ const loginUser = async (req,res) => {
 }
 
 const logout = async (req,res) => {
-    
+    const options = {
+        httpOnly:true,
+        secure:true
+    }
+
+   try {
+     return res
+         .clearCookie('accessToken', options)
+         .status(200)
+         .json({msg:"SuccessFully logged out"})
+   } catch (error) {
+    return res.status(400).json({msg:"problem while logging out user"})
+   }
 }
 
-export {registerUser, loginUser}
+export {registerUser, loginUser, logout}
