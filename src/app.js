@@ -7,7 +7,7 @@ dotenv.config();
 
 const PORT = process.env.PORT || 3000;
 
-const cpus = os.cpus().length;
+// const cpus = os.cpus().length;
 
 async function startServer() {
     try {
@@ -23,18 +23,24 @@ async function startServer() {
     }
 }
 
+startServer()
 
-if(cluster.isPrimary){
-    for(let i = 0; i < cpus; i++){
-        cluster.fork();
-    }
-    cluster.on("exit", (worker, code, signal) => {
-        console.log(`Worker ${worker.process.pid} died`);
-        cluster.fork()
-    })
-}else{
-    startServer().catch(err => {
-        console.error("Failed to start server:", err);
-        process.exit(1);
-    });
-}
+
+
+// in development we dont need to run cluster
+
+// if(cluster.isPrimary){
+//     for(let i = 0; i < cpus; i++){
+//         cluster.fork();
+//     }
+//     cluster.on("exit", (worker, code, signal) => {
+//         console.log(`Worker ${worker.process.pid} died`);
+//         cluster.fork()
+//     })
+// }else{
+//     startServer().catch(err => {
+//         console.error("Failed to start server:", err);
+//         process.exit(1);
+//     });
+// }
+
