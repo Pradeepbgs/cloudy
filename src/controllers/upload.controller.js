@@ -1,11 +1,33 @@
-import {client} from '../db/postgresDB.js'
+import { client } from "../db/postgresDB.js";
 
-const uploadFile = async (req,res) => {
-    const image = req.file
-    if(!image) return res.status(400).json({message: 'No image provided'})
+const uploadFile = async (req, res) => {
+  const  user  = req.user;
+  const file = req.file;
 
-    res.status(200).json({message: 'Image uploaded successfully', image})
-}
+  if (!user) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+  if (!file) {
+    return res.status(400).json({ message: "No image provided" });
+  }
 
+  try {
+    const query = `
+        INSERT INTO file (user_id, filename, filetype, filesize)
+        VALUES ($1, $2, $3, $4)
+        RETURNING *;
+        `;
+    const value = [user.id, file.filename, file.mimetype, file.size];
+    const result = await client.query(query, value);
 
-export {uploadFile}
+    return res.status(200).json({
+      message: "File uploaded successfully",
+      file: result.rows[0],
+    });
+  } catch (error) {
+    console.error("Error uploading file:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export { uploadFile };
